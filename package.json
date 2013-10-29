@@ -34,9 +34,6 @@
   "dependencies": {
     "q": "*"
   },
-  "scripts": {
-    "prepublish": "coffee -c -o lib src/esl.coffee.md && coffee -c -o lib src/parser.coffee.md && coffee -c -o lib src/response.coffee.md"
-  },
   "engines": {
     "node": ">=0.4.7"
   },
@@ -45,11 +42,5 @@
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/shimaore/esl/issues"
-  },
-  "_id": "esl@0.3.2",
-  "dist": {
-    "shasum": "b3b61d36d73eed9c32682ec88dc7a7f97fce9c5e"
-  },
-  "_from": "esl@",
-  "_resolved": "https://registry.npmjs.org/esl/-/esl-0.3.2.tgz"
+  }
 }
