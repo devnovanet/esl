@@ -1,0 +1,55 @@
+{
+  "name": "esl",
+  "version": "0.3.2",
+  "description": "Client and Server for FreeSwitch Event System",
+  "keywords": [
+    "freeswitch",
+    "event"
+  ],
+  "author": {
+    "name": "Stéphane Alnet",
+    "email": "stephane@shimaore.net"
+  },
+  "homepage": "https://github.com/shimaore/esl",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shimaore/esl.git"
+  },
+  "contributors": [
+    {
+      "name": "Paweł Pierścionek",
+      "email": "pawel@voiceworks.pl"
+    },
+    {
+      "name": "Akash Deep Verma",
+      "email": "akashdeep@flexydial.com"
+    }
+  ],
+  "main": "lib/esl.js",
+  "files": [
+    "lib/esl.js",
+    "lib/parser.js",
+    "lib/response.js"
+  ],
+  "dependencies": {
+    "q": "*"
+  },
+  "scripts": {
+    "prepublish": "coffee -c -o lib src/esl.coffee.md && coffee -c -o lib src/parser.coffee.md && coffee -c -o lib src/response.coffee.md"
+  },
+  "engines": {
+    "node": ">=0.4.7"
+  },
+  "ok": true,
+  "readme": "Client and server for FreeSwitch events socket that follow Node.js conventions\n\nInstall\n-------\n\n    npm install esl\n\nOverview\n--------\n\nThis module is modelled after Node.js' own httpServer and client.\n\nIt offers two Event Socket handlers, `createClient()` and `createCallServer()`.\n\nTypically a client would be used to trigger calls asynchronously (for example in a click-to-dial application); this mode of operation is called \"inbound\" (to FreeSwitch) in the [Event Socket](http://wiki.freeswitch.org/wiki/Event_Socket) FreeSwitch documentation.\n\nA server will handle calls sent to it using the \"socket\" diaplan application (called \"outbound\" mode in the [Event Socket Outbound](http://wiki.freeswitch.org/wiki/Event_Socket_Outbound) FreeSwitch documentation).  The server is available at a pre-defined port which the `socket` dialplan application will specify.\n\nSupport\n-------\n\nMailing list: <carrierclass@googlegroups.com>\nSubscribe: <https://groups.google.com/d/forum/carrierclass>\n\nUsage\n-----\n\n    esl = require 'esl'\n\nThe library is a plain Node.js module so you can also call it from Javascript. All examples are given using CoffeeScript for simplicity but will work as plain Javascript.\n\nClient Example\n--------------\n\nThe following code does the equivalent of `fs_cli -x`: it connects to the Event Socket, runs a single command, then disconnects.\n\n    esl = require 'esl'\n\n    fs_command = (cmd,cb) ->\n      # Open connection.\n      client = esl.createClient()\n      client.on 'esl_auth_request', (call) ->\n        call.auth 'ClueCon', ->\n          # Send arbitrary API command.\n          call.api cmd, ->\n            # Disconnect.\n            call.exit ->\n              # Stops the client.\n              client.end()\n      if cb?\n        client.on 'close', cb\n      client.connect(8021, '127.0.0.1')\n\n    # Example\n    fs_command \"reloadxml\"\n\nNote: Use `call.event_json 'HEARTBEAT'` to start receiving event notifications.\n\nCallServer Example\n------------------\n\nFrom the FreeSwitch dialplan, use `<action application=\"socket\" data=\"127.0.0.1:7000 async full\"/>` to hand the call over to an Event Socket server.\n\nIf you'd like to get realtime channel variables after each `command()`, execute the `verbose_events` command first:\n\n    server = esl.createCallServer()\n\n    server.on 'CONNECT', (call) ->\n      # \"verbose_events\" will send us channel data after each \"command\".\n      call.command 'verbose_events', (call) ->\n        # command() will wait for the command to finish.\n        call.command 'play-file', 'voicemail/vm-hello', (call) ->\n          # You may now access realtime variables from call.body\n          foo = call.body.variable_foo\n\n    server.listen 7000\n\nFor some applications you might want to capture channel events instead of using the `command()` / callback pattern:\n\n    server = esl.createCallServer()\n\n    server.on 'CONNECT', (call) ->\n      uri = call.body.variable_sip_req_uri\n\n      # These are called asynchronously.\n      call.on 'CHANNEL_ANSWER', (call) ->\n        util.log 'Call was answered'\n      call.on 'CHANNEL_HANGUP_COMPLETE', (call) ->\n        util.log 'Call was disconnected'\n\n    # Start the ESL server on port 7000.\n    server.listen 7000\n\nMore Examples\n-------------\n\n* Client example: [send commands](https://github.com/shimaore/ccnq3/blob/master/applications/freeswitch/agents/freeswitch.coffee)\n* Server example: [voicemail application](https://github.com/shimaore/ccnq3/tree/master/applications/voicemail/node/)\n* Also see under examples/ in the source for contributed examples.\n\nAlternative\n-----------\n\nThis module should be more convenient if you've already coded for Node.js and are used to its [`http` interface](http://nodejs.org/api/http.html) and the `EventEmitter` pattern.\nIf you are coming from the world of FreeSwitch and are used to the Event Socket Library API, you might want to try [node-esl](https://github.com/englercj/node-esl).\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/shimaore/esl/issues"
+  },
+  "_id": "esl@0.3.2",
+  "dist": {
+    "shasum": "b3b61d36d73eed9c32682ec88dc7a7f97fce9c5e"
+  },
+  "_from": "esl@",
+  "_resolved": "https://registry.npmjs.org/esl/-/esl-0.3.2.tgz"
+}
